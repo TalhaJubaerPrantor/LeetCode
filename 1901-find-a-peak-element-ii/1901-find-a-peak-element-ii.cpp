@@ -1,39 +1,32 @@
 class Solution {
 public:
-    int indxI(vector<vector<int>>& mat, int j) {
-
-        int mx = INT_MIN;
-        int idx = -1;
-        for (int i = 0; i < mat.size(); i++) {
-            if (mat[i][j] > mx) {
-                mx = mat[i][j];
-                idx = i;
-            }
+    int findMax(vector<vector<int>>& mat, int col){
+        int maxRow=0;
+        for(int i=0;i<mat.size();i++){
+            maxRow= mat[i][col]>=mat[maxRow][col] ? i: maxRow;
         }
-
-        return idx;
+        return maxRow;
     }
-
+    bool predicate(int midCol,vector<vector<int>>& mat, int leftCol, int rightCol ){
+        int maxRow=findMax(mat,midCol);
+        bool rejectRight= midCol+1 <= rightCol &&mat[maxRow][midCol+1] < mat[maxRow][midCol];   
+        return rejectRight;
+    }
     vector<int> findPeakGrid(vector<vector<int>>& mat) {
-
-        int left = 0;
-        int right = mat[0].size() - 1;
-        vector<int> ans(2, 0);
-        while (left <= right) {
-            int mid = left + (right - left) / 2;
-            int i = indxI(mat, mid);
-            if (mat[i][mid] < mat[i][mid + 1]) {
-                left = mid + 1;
-            } else {
-                right = mid - 1;
+        int leftCol=0;
+        int rightCol=mat[0].size()-1;
+        while(leftCol<rightCol){
+            int midCol= leftCol + (rightCol-leftCol)/2;
+            if(predicate(midCol,mat,leftCol,rightCol)){
+                rightCol=midCol;
             }
-        }
-        if (right < 0)
-            right = 0;
-        if (left < 0)
-            left = 0;
-        ans[0] = left;
-        ans[1] = right + 1;
-        return ans;
+            else{
+                leftCol=midCol+1;
+            }
+        }                        
+        int maxRow=findMax(mat,leftCol);
+        return vector<int>{maxRow, leftCol};
+
     }
+
 };
